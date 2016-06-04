@@ -2,7 +2,7 @@
 #   https://hub.docker.com/_/wordpress/
 
 # base image
-FROM wordpress:4.4.2-fpm
+FROM wordpress:4.5.2-fpm
 
 # install the php extensions we need
 RUN set -ex \
@@ -29,3 +29,16 @@ RUN set -ex \
     && rm -rf /tmp/ioncube_install \
     && echo "zend_extension = $php_ext_dir/ioncube_loader_lin_5.6.so" \
         > /usr/local/etc/php/conf.d/00-ioncube.ini
+
+# install required plugins
+ENV WP_PLUGINS_URL 'https://downloads.wordpress.org/plugin'
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y \
+        unzip \
+    && rm -rf /var/lib/apt/lists/* \
+    && cd /usr/src/wordpress/wp-content/plugins \
+    && curl -fSL -o updraftplus.zip \
+        "$WP_PLUGINS_URL/updraftplus.1.12.12.zip" \
+    && unzip *.zip \
+    && rm *.zip
